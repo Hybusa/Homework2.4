@@ -12,11 +12,11 @@ public class Main {
         String password = getInput("Enter Password:");
         String passwordRepeat = getInput("Repeat Password:");
 
-        System.out.println(loginAndPasswordInputAndCheck(login, password, passwordRepeat));
+        System.out.println(loginAndPasswordCheck(login, password, passwordRepeat));
 
     }
 
-    private static boolean loginAndPasswordInputAndCheck(String login, String password, String repeatPassword) {
+    private static boolean loginAndPasswordCheck(String login, String password, String repeatPassword) {
 
         try {
             checkPassword(password);
