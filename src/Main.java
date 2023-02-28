@@ -1,4 +1,3 @@
-import Enums.InputTypes;
 import Exceptions.PasswordMismatchException;
 import Exceptions.WrongLoginException;
 import Exceptions.WrongPasswordException;
@@ -6,23 +5,22 @@ import Exceptions.WrongPasswordException;
 import java.util.Scanner;
 
 public class Main {
+    private final static int LENGTH = 20;
     public static void main(String[] args) {
 
-        String login = getInput(InputTypes.LOGIN);
-        String password = getInput(InputTypes.PASSWORD);
-        String passwordRepeat = getInput(InputTypes.PASSWORD_REPEAT);
+        String login = getInput("Enter Login:");
+        String password = getInput("Enter Password:");
+        String passwordRepeat = getInput("Repeat Password:");
 
         System.out.println(loginAndPasswordInputAndCheck(login, password, passwordRepeat));
 
     }
 
-
     private static boolean loginAndPasswordInputAndCheck(String login, String password, String repeatPassword) {
 
         try {
-            checkSyntax(login, InputTypes.LOGIN);
-            checkSyntax(password, InputTypes.PASSWORD);
-            checkSyntax(repeatPassword, InputTypes.PASSWORD);
+            checkPassword(password);
+            checkLogin(login);
             checkPasswordMatch(password,repeatPassword);
         }catch (RuntimeException e)
         {
@@ -32,32 +30,28 @@ public class Main {
 
         return true;
     }
-
-    private static String getInput(InputTypes inputType) {
+    private static String getInput(String banner){
         Scanner userInput = new Scanner(System.in);
-        String returnString = null;
-
-        switch (inputType) {
-            case LOGIN:
-                System.out.println("Enter Login:");
-                if (userInput.hasNextLine()) {
-                    returnString = userInput.nextLine();
-                }
-                break;
-            case PASSWORD:
-                System.out.println("Enter Password:");
-                if (userInput.hasNextLine()) {
-                    returnString =  userInput.nextLine();
-                }
-                break;
-            case PASSWORD_REPEAT:
-                System.out.println("Repeat Password:");
-                if (userInput.hasNextLine()) {
-                    returnString =  userInput.nextLine();
-                }
-                break;
+        System.out.println(banner);
+        if (userInput.hasNextLine()) {
+            return userInput.nextLine();
         }
-        return returnString;
+        return null;
+    }
+
+    private static void checkPassword(String password)
+    {
+        if(!checkCriteria(password) || !checkLength(password))
+            throw new WrongPasswordException("Password must contain only Letters Number and _" +
+                    " or must be less then 20 symbols");
+
+    }
+    private static void checkLogin(String login)
+    {
+        if(checkCriteria(login) || !checkLength(login))
+            throw new WrongLoginException("Login must contain only Letters Number and _ ," +
+                    " or must be less then 20 symbols");
+
     }
 
     private static void checkPasswordMatch(String password, String repeatPassword) {
@@ -66,18 +60,17 @@ public class Main {
             throw new PasswordMismatchException("Passwords must match");
         }
     }
+    private static boolean checkCriteria(String password)
+    {
+        return checkLength(password) && checkSyntax(password);
+    }
 
-    private static void checkSyntax(String input, InputTypes inputType) {
-        if (!input.matches("^[a-zA-Z0-9_.]*$") || input.length() > 20) {
-            switch (inputType) {
-                case LOGIN:
-                    throw new WrongLoginException("Login must contain only Letters Number and _ ," +
-                            " or must be less then 20 symbols");
-                case PASSWORD:
-                    throw new WrongPasswordException("Password must contain only Letters Number and _" +
-                            " or must be less then 20 symbols");
-            }
-        }
+    private static boolean checkSyntax(String input) {
+        return input.matches("^[a-zA-Z0-9_.]*$");
+    }
+
+    private static boolean checkLength(String input) {
+        return input.length() <= LENGTH;
     }
 
 }
